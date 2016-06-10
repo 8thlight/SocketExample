@@ -5,6 +5,7 @@ public class ServerSocketWrapperTest {
     @Test
     public void itAcceptsConnections() {
         ServerSocketWrapper wrapper = new ServerSocketWrapper();
+        wrapper.start(5000);
 
     }
 }
