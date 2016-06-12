@@ -1,7 +1,10 @@
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -55,6 +58,23 @@ public class ServerSocketWrapperTest {
         waitForDataToBePresent(sentData[0]);
 
         assertEquals("data", sentData[0]);
+    }
+
+    @Test
+    public void itWritesBackWhatTheRouterReturns() throws IOException {
+        Function<String, String> router = string -> {
+            return "returned data";
+        };
+        startServerSocket(router);
+
+        Socket socket = new Socket("localhost", 5000);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        sendDataToSocket(socket, "irrelevant");
+
+        socket.setSoTimeout(100);
+        String readData = reader.readLine();
+
+        assertEquals("returned data", readData);
     }
 
     private void waitForDataToBePresent(String s) throws InterruptedException {

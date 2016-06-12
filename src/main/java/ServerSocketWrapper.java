@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.function.Function;
@@ -14,8 +12,12 @@ public class ServerSocketWrapper {
         serverSocket = new ServerSocket(port);
         socket = serverSocket.accept();
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         String data = in.readLine();
-        router.apply(data);
+
+        String response = router.apply(data);
+        out.write(response);
+        out.flush();
     }
 
     public void stop() throws IOException {
