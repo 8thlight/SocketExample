@@ -25,8 +25,7 @@ public class ServerSocketWrapperTest {
 
     @Test
     public void itStartsAndStopsAServer() throws IOException {
-
-        wrapper.start(5000);
+        startServerSocket();
 
         try(Socket socketThatWorks = new Socket("localhost", 5000)) {
             assertTrue(socketThatWorks.isConnected());
@@ -42,22 +41,34 @@ public class ServerSocketWrapperTest {
     }
 
     @Test
-    public void itAcceptsDataOverTheConnection() throws IOException {
-        wrapper.start(5000);
+    public void itAcceptsDataOverTheConnectionAndRoutesIt() throws IOException {
+        final String[] sentData = new String[1];
+        Function<String, String> router = string -> {
+            sentData[0] = string;
+            return "";
+        };
+        wrapper.setRouter(router);
+
+        startServerSocket();
 
         Socket socket = new Socket("localhost", 5000);
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         out.println("data");
         out.flush();
 
-        final String[] sentData = new String[1];
-        Function<String, String> router = string -> {
-            sentData[0] = string;
-            return "";
-        };
-
-        wrapper.setRouter(router);
-
         assertEquals("data", sentData[0]);
+    }
+
+    private void startServerSocket() {
+        new Thread() {
+            public void run() {
+                try {
+                    wrapper.start(5000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }.start();
     }
 }
