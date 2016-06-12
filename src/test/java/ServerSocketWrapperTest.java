@@ -99,7 +99,6 @@ public class ServerSocketWrapperTest {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         }.start();
     }
