@@ -13,6 +13,8 @@ import java.util.function.Function;
 import static junit.framework.TestCase.*;
 
 public class ServerSocketWrapperTest {
+    public static final int PORT = 5000;
+    public static final String HOST = "localhost";
     ServerSocketWrapper wrapper;
 
     @Before
@@ -30,13 +32,13 @@ public class ServerSocketWrapperTest {
         Function<String, String> dummyRouter = string -> { return ""; };
         startServerSocket(dummyRouter);
 
-        try(Socket socketThatWorks = new Socket("localhost", 5000)) {
+        try(Socket socketThatWorks = new Socket(HOST, PORT)) {
             assertTrue(socketThatWorks.isConnected());
         }
 
         wrapper.stop();
         try {
-            new Socket("localhost", 5000);
+            new Socket(HOST, PORT);
             fail("Socket should not connect when there is no server running");
         } catch (ConnectException e) {
 
@@ -52,7 +54,7 @@ public class ServerSocketWrapperTest {
         };
         startServerSocket(router);
 
-        Socket socket = new Socket("localhost", 5000);
+        Socket socket = new Socket(HOST, PORT);
         sendDataToSocket(socket, "data");
 
         waitForDataToBePresent(sentData[0]);
@@ -65,7 +67,7 @@ public class ServerSocketWrapperTest {
         Function<String, String> router = string -> "returned data\n";
         startServerSocket(router);
 
-        Socket socket = new Socket("localhost", 5000);
+        Socket socket = new Socket(HOST, PORT);
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         sendDataToSocket(socket, "irrelevant");
 
@@ -93,7 +95,7 @@ public class ServerSocketWrapperTest {
         new Thread() {
             public void run() {
                 try {
-                    wrapper.start(router, 5000);
+                    wrapper.start(router, PORT);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
