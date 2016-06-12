@@ -13,9 +13,9 @@ import java.util.function.Function;
 import static junit.framework.TestCase.*;
 
 public class ServerSocketWrapperTest {
-    public static final int PORT = 5000;
-    public static final String HOST = "localhost";
-    ServerSocketWrapper wrapper;
+    private static final int PORT = 5000;
+    private static final String HOST = "localhost";
+    private ServerSocketWrapper wrapper;
 
     @Before
     public void setUp() {
@@ -29,7 +29,7 @@ public class ServerSocketWrapperTest {
 
     @Test
     public void itStartsAndStopsAServer() throws IOException {
-        Function<String, String> dummyRouter = string -> { return ""; };
+        Function<String, String> dummyRouter = string -> "";
         startServerSocket(dummyRouter);
 
         try(Socket socketThatWorks = new Socket(HOST, PORT)) {
@@ -40,7 +40,7 @@ public class ServerSocketWrapperTest {
         try {
             new Socket(HOST, PORT);
             fail("Socket should not connect when there is no server running");
-        } catch (ConnectException e) {
+        } catch (ConnectException ignored) {
 
         }
     }
