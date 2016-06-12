@@ -62,16 +62,14 @@ public class ServerSocketWrapperTest {
 
     @Test
     public void itWritesBackWhatTheRouterReturns() throws IOException {
-        Function<String, String> router = string -> {
-            return "returned data";
-        };
+        Function<String, String> router = string -> "returned data\n";
         startServerSocket(router);
 
         Socket socket = new Socket("localhost", 5000);
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         sendDataToSocket(socket, "irrelevant");
 
-        socket.setSoTimeout(100);
+        socket.setSoTimeout(10);
         String readData = reader.readLine();
 
         assertEquals("returned data", readData);
