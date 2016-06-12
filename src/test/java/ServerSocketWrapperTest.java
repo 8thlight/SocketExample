@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.function.Function;
 
 import static junit.framework.TestCase.*;
@@ -51,17 +50,25 @@ public class ServerSocketWrapperTest {
         startServerSocket(router);
 
         Socket socket = new Socket("localhost", 5000);
-        PrintWriter out = new PrintWriter(socket.getOutputStream());
-        out.println("data");
-        out.flush();
+        sendDataToSocket(socket, "data");
 
+        waitForDataToBePresent(sentData[0]);
+
+        assertEquals("data", sentData[0]);
+    }
+
+    private void waitForDataToBePresent(String s) throws InterruptedException {
         int retries = 0;
-        while (sentData[0] == null && retries < 5) {
+        while (s == null && retries < 5) {
             retries++;
             Thread.sleep(10);
         }
+    }
 
-        assertEquals("data", sentData[0]);
+    private void sendDataToSocket(Socket socket, String data) throws IOException {
+        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        out.println(data);
+        out.flush();
     }
 
     private void startServerSocket(Function<String, String> router) {
