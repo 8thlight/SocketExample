@@ -41,7 +41,7 @@ public class ServerSocketWrapperTest {
     }
 
     @Test
-    public void itAcceptsDataOverTheConnectionAndRoutesIt() throws IOException {
+    public void itAcceptsDataOverTheConnectionAndRoutesIt() throws IOException, InterruptedException {
         final String[] sentData = new String[1];
         Function<String, String> router = string -> {
             sentData[0] = string;
@@ -55,6 +55,12 @@ public class ServerSocketWrapperTest {
         PrintWriter out = new PrintWriter(socket.getOutputStream());
         out.println("data");
         out.flush();
+
+        int retries = 0;
+        while (sentData[0] == null && retries < 5) {
+            retries++;
+            Thread.sleep(10);
+        }
 
         assertEquals("data", sentData[0]);
     }
