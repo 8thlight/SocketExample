@@ -25,7 +25,8 @@ public class ServerSocketWrapperTest {
 
     @Test
     public void itStartsAndStopsAServer() throws IOException {
-        startServerSocket();
+        Function<String, String> dummyRouter = string -> { return ""; };
+        startServerSocket(dummyRouter);
 
         try(Socket socketThatWorks = new Socket("localhost", 5000)) {
             assertTrue(socketThatWorks.isConnected());
@@ -47,9 +48,7 @@ public class ServerSocketWrapperTest {
             sentData[0] = string;
             return "";
         };
-        wrapper.setRouter(router);
-
-        startServerSocket();
+        startServerSocket(router);
 
         Socket socket = new Socket("localhost", 5000);
         PrintWriter out = new PrintWriter(socket.getOutputStream());
@@ -65,11 +64,11 @@ public class ServerSocketWrapperTest {
         assertEquals("data", sentData[0]);
     }
 
-    private void startServerSocket() {
+    private void startServerSocket(Function<String, String> router) {
         new Thread() {
             public void run() {
                 try {
-                    wrapper.start(5000);
+                    wrapper.start(router, 5000);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
