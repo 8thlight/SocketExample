@@ -1,3 +1,5 @@
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -9,31 +11,41 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ServerSocketWrapperTest {
+    public static final String LOCALHOST = "localhost";
+    public static final int PORT = 5000;
+    private ServerSocketWrapper wrapper;
+
+    @Before
+    public void setUp() {
+        wrapper = new ServerSocketWrapper();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        wrapper.stop();
+    }
 
     @Test
-    public void itStartsAndStopsAServer() throws IOException {
-        ServerSocketWrapper wrapper = new ServerSocketWrapper();
-        wrapper.start(5000);
+    public void itStartsAServer() throws IOException {
+        wrapper.start(PORT);
 
-        Socket client = new Socket("localhost", 5000);
+        Socket client = new Socket(LOCALHOST, PORT);
         assertTrue(client.isConnected());
     }
 
     @Test(expected = ConnectException.class)
     public void itStopsAServer() throws IOException {
-        ServerSocketWrapper wrapper = new ServerSocketWrapper();
-        wrapper.start(5000);
+        wrapper.start(PORT);
         wrapper.stop();
 
-        new Socket("localhost", 5000);
+        new Socket(LOCALHOST, PORT);
     }
 
     @Test
     public void itCanAcceptData() throws IOException {
-        ServerSocketWrapper wrapper = new ServerSocketWrapper();
-        wrapper.start(5000);
+        wrapper.start(PORT);
 
-        Socket client = new Socket("localhost", 5000);
+        Socket client = new Socket(LOCALHOST, PORT);
         PrintWriter out = new PrintWriter(client.getOutputStream());
         out.println("sent data");
         out.flush();
